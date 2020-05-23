@@ -82,6 +82,7 @@
     "redux-connect": "^10.0.0",
     "semantic-ui-css": "^2.4.1",
     "slick-carousel": "^1.8.1",
+    "sparql-http-client": "^2.2.2",
     "start": "^5.1.0",
     "webpack-bundle-analyzer": "^3.6.1"
   },

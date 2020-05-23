@@ -15,6 +15,8 @@ import ArticlesListEdit from '~/components/manage/Blocks/ArticlesList/Edit';
 import ChildrenLinksView from '~/components/manage/Blocks/ChildrenLinks/View'
 import ChildrenLinksEdit from '~/components/manage/Blocks/ChildrenLinks/Edit'
 
+import ArticlesFetcherEdit from '~/components/manage/Blocks/ArticlesFetcher/Edit'
+import ArticlesFetcherView from '~/components/manage/Blocks/ArticlesFetcher/View'
 
 const applyConfig = config => {
   console.log('config', config)
@@ -38,6 +40,15 @@ const applyConfig = config => {
     title: 'Detailed Link',
     view: DetailedLinkView,
     edit: DetailedLinkEdit,
+    icon: config.blocks.blocksConfig.text.icon,
+  };
+
+  config.blocks.blocksConfig.articles_fetcher = {
+    id: 'articles_fetcher',
+    group: 'custom_addons',
+    title: 'Articles Fetcher',
+    view: ArticlesFetcherView,
+    edit: ArticlesFetcherEdit,
     icon: config.blocks.blocksConfig.text.icon,
   };
 
