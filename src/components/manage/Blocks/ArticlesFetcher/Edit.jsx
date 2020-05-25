@@ -56,26 +56,29 @@ const Edit = (props) => {
 
   const articles = props.data.articles ? props.data.articles : ''
 
+  const articlesPaginated = [...articles].slice(0, 3)
+
   return (
     <Grid columns={1}>
       {hasQueryData && !articles &&
         <p>Loading..</p>
       }
       {hasQueryData && articles &&
-        articles.slice(0, 10).map(article =>
-          <div className="article-list-row">
-            <img className="article-img" src={`https://readreidread.files.wordpress.com/2011/09/yellow_tree1.jpg?w=998&h=624`} />
-            <Grid.Column>
-              <p className="article-title">
-                {article.title.value}</p>
-              <p class="article-date">{article.published.value}</p>
-              <p className="article-description">{article.description.value}</p>
-              <a className="read-article" target="_blank" href={article.uri.value}>
-                READ ARTICLE
-              </a>
-            </Grid.Column>
-          </div>
-        )
+        <Grid.Column>
+          {articlesPaginated.map(article =>
+            <div className="article-list-row">
+              <img className="article-img" src={`https:readreidread.files.wordpress.com/2011/09/yellow_tree1.jpg?w=998&h=624`} />
+              <Grid.Column>
+                <p className="article-title">
+                  {article.title.value}</p>
+                <p class="article-date">{article.published.value}</p>
+                <p className="article-description">{article.description.value}</p>
+                <a className="read-article" target="_blank" href={article.uri.value}>
+                  READ ARTICLE
+               </a>
+              </Grid.Column>
+            </div>)}
+        </Grid.Column>
       }
       {!hasQueryData &&
         <p>Use Sidebar to set Endpoint and Query Data.</p>
