@@ -17,107 +17,111 @@ import schema from './schema';
 
 const SparqlClient = require('sparql-http-client');
 
-const Edit = (props) => {
-	const [ articleList, setArticleList ] = useState('');
+const Edit = props => {
+  const [articleList, setArticleList] = useState('');
 
-	const [ activePage, setActivePage ] = useState(1);
+  const [activePage, setActivePage] = useState(1);
 
-	const handleFetch = async () => {
-		const endpointUrl = props.data.endpoint;
-		const request = props.data.request;
+  const hasRequest = props.data.request || props.data.customRequest
+  const hasQueryData = props.data.endpoint && hasRequest;
 
-		const client = new SparqlClient({ endpointUrl });
-		const stream = await client.query.select(request);
 
-		var fullItems = [];
+  const handleFetch = async () => {
+    const endpointUrl = props.data.endpoint;
+    const request = props.data.customRequest ? props.data.customRequest : props.data.request;
 
-		stream.on('data', (row) => {
-			fullItems.push(row);
-		});
+    const client = new SparqlClient({ endpointUrl });
+    const stream = await client.query.select(request);
 
-		setArticleList(fullItems);
+    var fullItems = [];
 
-		props.onChangeBlock(props.block, {
-			...props.data,
-			articles: fullItems
-		});
+    stream.on('data', row => {
+      fullItems.push(row);
+    });
 
-		stream.on('error', (err) => {
-			console.error(err);
-		});
-	};
+    setArticleList(fullItems);
 
-	useEffect(
-		() => {
-			if (props.data.endpoint && props.data.request && articleList !== props.data.articles) {
-				handleFetch();
-			}
-		},
-		[ props.data ]
-	);
+    props.onChangeBlock(props.block, {
+      ...props.data,
+      articles: fullItems,
+    });
 
-	const handlePaginationChange = (e, { activePage }) => {
-		setActivePage(activePage);
-	};
+    stream.on('error', err => {
+      console.error(err);
+    });
+  };
 
-	const hasQueryData = props.data.endpoint && props.data.request;
+  useEffect(() => {
+    if (
+      hasQueryData &&
+      articleList !== props.data.articles
+    ) {
+      handleFetch();
+    }
+  }, [props.data]);
 
-	const articles = props.data.articles ? props.data.articles : '';
+  const handlePaginationChange = (e, { activePage }) => {
+    setActivePage(activePage);
+  };
 
-	const articlesPerPage = 3;
 
-	const articlesPaginated = [ ...articles ].slice((activePage - 1) * articlesPerPage, activePage * articlesPerPage);
+  const articles = props.data.articles ? props.data.articles : '';
 
-	const totalPages = parseInt(articles.length / articlesPerPage);
+  const articlesPerPage = 3;
 
-	return (
-		<Grid columns={1}>
-			{hasQueryData && !articles && <p>Loading..</p>}
-			{hasQueryData &&
-			articles && (
-				<Grid.Column>
-					{articlesPaginated.map((article, id) => (
-						<Article
-							key={id}
-							img={`https:readreidread.files.wordpress.com/2011/09/yellow_tree1.jpg?w=998&h=624`}
-							title={article.title.value ? article.title.value : ' '}
-							description={article.description.value ? article.description.value : ' '}
-							url={article.uri.value ? article.uri.value : ' '}
-							date={article.published.value ? article.published.value : ' '}
-						/>
-					))}
-					<Pagination activePage={activePage} onPageChange={handlePaginationChange} totalPages={totalPages} />
-				</Grid.Column>
-			)}
-			{!hasQueryData && <p>Use Sidebar to set Endpoint and Query Data.</p>}
-			<SidebarPortal selected={props.selected}>
-				<BlockEditForm
-					schema={schema}
-					title={schema.title}
-					onChangeField={(id, value) => {
-						props.onChangeBlock(props.block, {
-							...props.data,
-							[id]: value
-						});
-					}}
-					formData={props.data}
-					block={props.block}
-				/>
-			</SidebarPortal>
-		</Grid>
-	);
+  const articlesPaginated = [...articles].slice(
+    (activePage - 1) * articlesPerPage,
+    activePage * articlesPerPage,
+  );
+
+  const totalPages = parseInt(articles.length / articlesPerPage);
+
+  return (
+    <Grid columns={1}>
+      {hasQueryData && !articles && <p>Loading..</p>}
+      {articles && !props.data.renderComponent && <p>Please select Render Component to display fetched items</p>}
+      {hasQueryData && articles && props.data.renderComponent === "articleList" && (
+        <Grid.Column>
+          {articlesPaginated.map((article, id) => (
+            <Article
+              key={id}
+              img={`https:readreidread.files.wordpress.com/2011/09/yellow_tree1.jpg?w=998&h=624`}
+              title={article.title.value}
+              description={
+                article.description.value
+              }
+              url={article.uri.value}
+              date={new Date(article.published.value).toLocaleDateString()}
+            />
+          ))}
+          <Pagination
+            activePage={activePage}
+            onPageChange={handlePaginationChange}
+            totalPages={totalPages}
+          />
+        </Grid.Column>
+      )}
+      {!hasQueryData && <p>Use Sidebar to set Endpoint and Query Data.</p>}
+      <SidebarPortal selected={props.selected}>
+        <BlockEditForm
+          schema={schema}
+          title={schema.title}
+          onChangeField={(id, value) => {
+            props.onChangeBlock(props.block, {
+              ...props.data,
+              [id]: value,
+            });
+          }}
+          formData={props.data}
+          block={props.block}
+        />
+      </SidebarPortal>
+    </Grid>
+  );
 };
 
 const mapDispatchToProps = {
-	getParentFolderData
+  getParentFolderData,
 };
 
-export default compose(
-	injectIntl,
-	connect(
-		(state) => ({
-			state
-		}),
-		mapDispatchToProps
-	)
-)(Edit);
+export default injectIntl(Edit)

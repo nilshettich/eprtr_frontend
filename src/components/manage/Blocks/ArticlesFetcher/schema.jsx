@@ -29,7 +29,7 @@ const Fetcher = {
     {
       id: 'default',
       title: 'Default',
-      fields: ['endpoint', 'request'],
+      fields: ['endpoint', 'request', 'customRequest', 'renderComponent'],
     },
   ],
 
@@ -43,11 +43,21 @@ const Fetcher = {
       choices: [
         [articlesQuery, 'Fetch EEA Articles']
       ]
-    }
+    },
+    customRequest: {
+      title: "Custom Request",
+      type: "string"
+    },
+    renderComponent: {
+      title: 'Render Component',
+      choices: [
+        ['articleList', 'Article List']
+      ]
+    },
 
   },
 
-  required: ['endpoint', 'request'],
+  required: ['endpoint',],
 };
 
 export default Fetcher;
